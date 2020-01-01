@@ -12,7 +12,6 @@ export class OrbitListComponent implements OnInit {
   @Input() satellites: Satellite[];
 
   sortedAscending;
-
   
   constructor() { 
     this.sortedAscending = false;

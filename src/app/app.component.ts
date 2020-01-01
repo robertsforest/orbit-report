@@ -13,9 +13,22 @@ export class AppComponent {
   sourceList: Satellite[];
   displayList: Satellite[];
 
+  objectCounts;
+
+
   constructor() {
     this.sourceList = [];
     this.displayList = [];
+    this.objectCounts = {
+      total: 0,
+      debris: 0,
+      comms: 0,
+      probes: 0,
+      positioning: 0,
+      spaceStations: 0,
+      telescopes: 0
+    };
+
     let satellitesUrl = 'https://handlers.education.launchcode.org/static/satellites.json';
  
     window.fetch(satellitesUrl).then(function(response) {
@@ -27,21 +40,60 @@ export class AppComponent {
             this.sourceList.push(satellite);
           }
           this.displayList = this.sourceList.slice(0);
+          this.updateCounts();
        }.bind(this));
     }.bind(this));
+    
  }
 
- search(searchTerm: string): void {
-  let matchingSatellites: Satellite[] = [];
-  searchTerm = searchTerm.toLowerCase();
-  for(let i=0; i < this.sourceList.length; i++) {
-     let name = this.sourceList[i].name.toLowerCase();
-     if (name.indexOf(searchTerm) >= 0) {
-        matchingSatellites.push(this.sourceList[i]);
-     }
+  search(searchTerm: string): void {
+    let matchingSatellites: Satellite[] = [];
+    searchTerm = searchTerm.toLowerCase();
+
+    for(let i=0; i < this.sourceList.length; i++) {
+      let name = this.sourceList[i].name.toLowerCase();
+      if (name.indexOf(searchTerm) >= 0) {
+          matchingSatellites.push(this.sourceList[i]);
+      }
+    // assign this.displayList to be the the array of matching satellites
+    // this will cause Angular to re-make the table, but now only containing matches
+    this.displayList = matchingSatellites;
+    this.updateCounts();
+    }
   }
-  // assign this.displayList to be the the array of matching satellites
-  // this will cause Angular to re-make the table, but now only containing matches
-  this.displayList = matchingSatellites;
-}
+
+  updateCounts(): void {
+    this.objectCounts = {
+      total: 0,
+      debris: 0,
+      comms: 0,
+      probes: 0,
+      positioning: 0,
+      spaceStations: 0,
+      telescopes: 0
+    };
+    for(let i=0; i < this.displayList.length; i++){
+      this.objectCounts.total++;
+      switch (this.displayList[i].type) {
+        case "Communication":
+          this.objectCounts.comms++;
+          break;
+        case "Space Debris":
+          this.objectCounts.debris++;
+          break;
+        case "Positioning":
+          this.objectCounts.positioning++;
+          break;
+        case "Space Station":
+          this.objectCounts.spaceStations++;
+          break;
+        case "Probe":
+          this.objectCounts.probes++;
+          break;
+        case "Telescope":
+          this.objectCounts.telescopes++;
+      }
+    }
+    
+  }
 }
